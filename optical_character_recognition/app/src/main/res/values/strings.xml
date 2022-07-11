@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">OpticalCharacterRecognition</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="text_placeholder">Select a sample image or take new photo</string>
+    <string name="take_photo">Take photo</string>
+    <string name="texts_found">Text(s) found: </string>
+    <string name="no_text_found">No text found: </string>
+    <string name="capture_button_alt">Capture</string>
+</resources>

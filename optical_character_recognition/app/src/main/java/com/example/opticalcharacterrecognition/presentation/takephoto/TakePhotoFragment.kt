@@ -21,6 +21,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.example.opticalcharacterrecognition.MainActivity
@@ -54,6 +57,9 @@ class TakePhotoFragment : Fragment() {
 
     private lateinit var outputDirectory: File
 
+    private val _savedUri = MutableLiveData<Uri>()
+    var savedUri: LiveData<Uri> = _savedUri
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -77,6 +83,13 @@ class TakePhotoFragment : Fragment() {
         fragmentTakePhotoBinding.cameraCaptureButton.setOnClickListener{
             takePhoto()
         }
+
+        _savedUri.observe(this.viewLifecycleOwner, Observer<Uri> { uri ->
+            uri.encodedPath?.let {
+                sharedViewModel.setRootDirectory(it)
+                navigateToOverview()
+            }
+        })
     }
 
     private fun takePhoto() {
@@ -94,37 +107,39 @@ class TakePhotoFragment : Fragment() {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
+//                    val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
+//                    _savedUri.value = output.savedUri ?: Uri.fromFile(photoFile)
+                    _savedUri.postValue(output.savedUri ?: Uri.fromFile(photoFile))
 //                    savedUri.path
                     Log.d(TAG, "Photo capture succeeded: $savedUri")
-                    Log.d(TAG, "Photo capture succeeded encoded Path: ${savedUri.encodedPath}")
-                    Log.d(TAG, "Photo capture succeeded Path: ${savedUri.path}")
-                    savedUri.encodedPath?.let { sharedViewModel.setRootDirectory(it) }
+                    Log.d(TAG, "Photo capture succeeded encoded Path: ${savedUri.value?.encodedPath}")
+                    Log.d(TAG, "Photo capture succeeded Path: ${savedUri.value?.path}")
+//                    savedUri.encodedPath?.let { sharedViewModel.setRootDirectory(it) }
                     // Implicit broadcasts will be ignored for devices running API level >= 24
                     // so if you only target API level 24+ you can remove this statement
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                        requireActivity().sendBroadcast(
-                            Intent(Camera.ACTION_NEW_PICTURE, savedUri)
-                        )
-                    }
+//                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+//                        requireActivity().sendBroadcast(
+//                            Intent(Camera.ACTION_NEW_PICTURE, savedUri)
+//                        )
+//                    }
 
                     // If the folder selected is an external media directory, this is
                     // unnecessary but otherwise other apps will not be able to access our
                     // images unless we scan them using [MediaScannerConnection]
-                    val mimeType = MimeTypeMap.getSingleton()
-                        .getMimeTypeFromExtension(savedUri.toFile().extension)
-
-                    MediaScannerConnection.scanFile(
-                        context,
-                        arrayOf(savedUri.toFile().absolutePath),
-                        arrayOf(mimeType)
-                    ) { _, uri ->
-                        Log.d(TAG, "Image capture scanned into media store: $uri")
-                    }
-                    Log.d(TAG, "Navigate back")
-                    Handler(Looper.getMainLooper()).post {
-                        navigateToOverview()
-                    }
+//                    val mimeType = MimeTypeMap.getSingleton()
+//                        .getMimeTypeFromExtension(savedUri.toFile().extension)
+//
+//                    MediaScannerConnection.scanFile(
+//                        context,
+//                        arrayOf(savedUri.toFile().absolutePath),
+//                        arrayOf(mimeType)
+//                    ) { _, uri ->
+//                        Log.d(TAG, "Image capture scanned into media store: $uri")
+//                    }
+//                    Log.d(TAG, "Navigate back")
+//                    Handler(Looper.getMainLooper()).post {
+//                        navigateToOverview()
+//                    }
                 }
 
 

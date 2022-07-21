@@ -46,7 +46,7 @@ class OcrHelper(
     }
 
     private fun setupModel() {
-        detectionInterpreter = getInterpreter(context, detectionModelPath, true)
+        detectionInterpreter = getInterpreter(context, detectionModelPath, false)
         recognitionInterpreter = getInterpreter(context, recognitionModelPath, false)
     }
 
@@ -56,7 +56,7 @@ class OcrHelper(
         isUseGpu: Boolean
     ): Interpreter {
         val options = Interpreter.Options()
-        options.setNumThreads(4)
+        options.numThreads = 4
         if (isUseGpu) {
             val gpuDelegate = GpuDelegate()
             options.addDelegate(gpuDelegate)

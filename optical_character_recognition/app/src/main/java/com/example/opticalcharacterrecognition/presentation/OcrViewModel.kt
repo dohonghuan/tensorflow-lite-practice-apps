@@ -9,7 +9,8 @@ class OcrViewModel : ViewModel() {
     val rootDirectory: LiveData<String> = _rootDirectory
 
     fun setRootDirectory(root: String) {
-        _rootDirectory.postValue(root)
+//        _rootDirectory.postValue(root)
+        _rootDirectory.value = root
     }
 
     fun getRootDirectory(): String {
